@@ -100,7 +100,7 @@ def on_chat_message(msg):
 
 
             
-TOKEN = "607128868:AAFYbAun6dmow7sQd0ChIOCC93VTzcNPjMM"
+TOKEN = ""
 bot = telepot.Bot(TOKEN)
 bot.message_loop({'chat': on_chat_message})
 
