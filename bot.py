@@ -9,6 +9,7 @@ loginOK = None
 now = datetime.datetime.now()
 
 def agenda(filtro):
+    ''' Questa funzione la implementerò piu avanti 
     if filtro == 'all': #STAMPA COMPITI DA SEMPRE
         dateStart = datetime.date(2018, 9, 12)
         dateEnd = datetime.date(2019, 6, 9)
@@ -32,6 +33,7 @@ def agenda(filtro):
     elif filtro == 'day':
         giorno = datetime.date(now.year, now.month, now.day)
         print(sn.agenda(begin=giorno, end=giorno))
+        '''
 
 def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
@@ -42,6 +44,7 @@ def on_chat_message(msg):
         conta = 0
         itt = 0
         totale = "<b>Elenco Materie e insegnanti : </b>"
+        lessons = "<b> Le lezioni di oggi sono le seguenti </b>\n"
         #print("Messaggio di tipo testo!")
         messaggio = msg['text']
         print(messaggio)
@@ -53,15 +56,16 @@ def on_chat_message(msg):
             print("Password : ", password)
             print(sn.login(username=username, password=password))
             alunno = sn.login(username=username, password=password)
-            bot.sendMessage(chat_id, "Login effettuato con ID : " + str(alunno['id']))
-            bot.sendMessage(chat_id, "Nome Alunno : " + str(alunno['first_name'] + ' ' + str(alunno['last_name'])))
+            #bot.sendMessage(chat_id, "Login effettuato con ID : " + str(alunno['id']))
+            bot.sendMessage(chat_id, '<b>Login effettuato con successo!</b>', telegram.ParseMode.HTML)
+            bot.sendMessage(chat_id, "Loggato come : " + str(alunno['first_name'] + ' ' + str(alunno['last_name'])))
             if bool(alunno) == True:
                 loginOK = True
             else:
                 loginOK = False
         if messaggio[0:8] == '/materie': #VISUALIZZA LE MATERIE E I CORRISPONDENTI INSEGNANTI
             if loginOK is not True:
-               bot.sendMessage(chat_id, "<b>Non sei loggato!</b>\nPrima di poter accedere a questa funzione effettua il /login", telegram.ParseMode.HTML)
+               bot.sendMessage(chat_id, "<b>Non sei loggato!</b>\nPrima di poter accedere a questa funzione effettua il /login <i> username password </i>", telegram.ParseMode.HTML)
             else:
                 materie = sn.subjects()
                 materie = materie['subjects']
@@ -88,19 +92,35 @@ def on_chat_message(msg):
             #DOPO AD AGENDA INSERIRE PERIODO (ALL, WEEK, DAY)
             #print("I messaggi in agenda sono i seguenti")
             #filtro = input("Inserisci filtro\nFiltro : ")
-            if len(messaggio) <= 8:
-                print("Errore devi inserire una delle opzioni (All, Week, Day)")
-            filtro = msg['text']
-            #print(filtro[8:]) #PRENDE SOLO PARTE (ALL, WEEK, DAY)
-            agenda(filtro[8:])
+            '''Da terminare in attesa che vengano inseriti dei compiti'''
+            if loginOK is not True:
+                bot.sendMessage(chat_id, "<b>Non sei loggato!</b>\nPrima di poter accedere a questa funzione effettua il /login <i> username password </i>", telegram.ParseMode.HTML)
+            else:
+                oggi = datetime.date(now.year, now.month, now.day)
+                print(sn.agenda(begin=oggi, end=oggi))
 
         if messaggio[0:8] == '/lezioni':
-            #print(messaggio[0:8])    
-            print(sn.lessons())
+            conta = 0
+            if loginOK is not True:
+                bot.sendMessage(chat_id, "<b>Non sei loggato!</b>\nPrima di poter accedere a questa funzione effettua il /login <i> username password </i>", telegram.ParseMode.HTML)
+            else:
+                lezioni = sn.lessons()
+                lezioni = lezioni['lessons']
+                for x in lezioni:
+                    if lezioni[conta]['subjectDesc'] != 'SOSTEGNO':
+                        lessons += 'Modulo numero : ' + '<b>' + str(lezioni[conta]['evtHPos']) + '</b>' + '\n\n'
+                        lessons += '<i>' + 'Materie lezione : ' + str(lezioni[conta]['subjectDesc']).split('-')[0] + '</i>' + '\n'
+                        lessons += 'Insegnante : ' + '<i>' + str(lezioni[conta]['authorName']) + '</i>' + '\n'
+                        lessons += 'Tipo lezione : ' + str(lezioni[conta]['lessonType']) + '\n\n'
+                    conta += 1
+                
+                bot.sendMessage(chat_id, lessons, telegram.ParseMode.HTML)
+
+                #print(lessons)
 
 
             
-TOKEN = ""
+TOKEN = "607128868:AAFYbAun6dmow7sQd0ChIOCC93VTzcNPjMM"
 bot = telepot.Bot(TOKEN)
 bot.message_loop({'chat': on_chat_message})
 
