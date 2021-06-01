@@ -39,6 +39,6 @@ six==1.11.0
 SpeechRecognition==3.8.1
 telepot==12.7
 typing==3.6.4
-urllib3==1.22
+urllib3==1.26.5
 voluptuous==0.11.5
 yarl==1.2.5
